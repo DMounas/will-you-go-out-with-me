@@ -225,36 +225,65 @@
 
   let selectedDateObj = null;
 
-  // Set min date to today
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  datePicker.min = `${yyyy}-${mm}-${dd}`;
+  // Pure local YYYY-MM-DD formatter (avoids all UTC timezone offset bugs)
+  function formatToYMD(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  // Parse YYYY-MM-DD into a local Date at 12:00:00 (noon) to avoid any DST or midnight shifts
+  function parseFromYMD(ymdStr) {
+    if (!ymdStr) return null;
+    const parts = ymdStr.split('-').map(Number);
+    if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+  }
 
   function formatDateFriendly(date) {
+    if (!date) return '';
     const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
   }
 
-  function applyDate(date) {
-    selectedDateObj = date;
-    const dateStr = date.toISOString().split('T')[0];
-    datePicker.value = dateStr;
-    formattedDateText.textContent = formatDateFriendly(date);
+  // Set min date to today in local time
+  const today = new Date();
+  datePicker.min = formatToYMD(today);
+
+  function applyDate(date, syncInput = true) {
+    if (!date) return;
+    // Always anchor to noon to eliminate midnight rollover
+    selectedDateObj = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+    const ymd = formatToYMD(selectedDateObj);
+    if (syncInput) {
+      datePicker.value = ymd;
+    }
+    formattedDateText.textContent = formatDateFriendly(selectedDateObj);
     btnContinueActivity.removeAttribute('disabled');
   }
 
-  datePicker.addEventListener('change', () => {
+  function onDatePickerChange() {
     if (datePicker.value) {
-      initAudio();
-      playClick();
-      vibrate();
-      const [y, m, d] = datePicker.value.split('-').map(Number);
-      const chosen = new Date(y, m - 1, d);
-      quickPills.forEach(p => p.classList.remove('selected'));
-      applyDate(chosen);
+      const chosen = parseFromYMD(datePicker.value);
+      if (chosen) {
+        initAudio();
+        playClick();
+        vibrate();
+        quickPills.forEach(p => p.classList.remove('selected'));
+        applyDate(chosen, false);
+      }
     }
+  }
+
+  datePicker.addEventListener('change', onDatePickerChange);
+  datePicker.addEventListener('input', onDatePickerChange);
+  datePicker.addEventListener('click', () => {
+    try {
+      if (typeof datePicker.showPicker === 'function') {
+        datePicker.showPicker();
+      }
+    } catch (e) {}
   });
 
   // Quick pick pills
@@ -267,7 +296,8 @@
       pill.classList.add('selected');
 
       const daysVal = pill.getAttribute('data-days');
-      const target = new Date();
+      const now = new Date();
+      const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
 
       if (daysVal === '0') {
         // Today
@@ -283,16 +313,19 @@
         target.setDate(target.getDate() + diff);
       }
 
-      applyDate(target);
+      applyDate(target, true);
     });
   });
 
   // Auto-select upcoming weekend by default for immediate convenience
   const defaultSat = new Date();
   const dayOfWeek = defaultSat.getDay();
-  const diffToSat = (6 - dayOfWeek + 7) % 7 || 1;
-  defaultSat.setDate(defaultSat.getDate() + diffToSat);
-  applyDate(defaultSat);
+  const diffToSat = (6 - dayOfWeek + 7) % 7 || 7;
+  const initialDate = new Date(defaultSat.getFullYear(), defaultSat.getMonth(), defaultSat.getDate() + diffToSat, 12, 0, 0);
+  applyDate(initialDate, true);
+  quickPills.forEach(p => {
+    if (p.getAttribute('data-days') === 'weekend') p.classList.add('selected');
+  });
 
   btnContinueActivity.addEventListener('click', () => {
     playClick();
