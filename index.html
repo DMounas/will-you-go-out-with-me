@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff8fa3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Will You Go Out With Me? 💖</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Outfit:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Pixel Canvas for Hearts & Confetti -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- Mobile Floating Sound Toggle -->
+  <button id="sound-btn" class="sound-pill" aria-label="Toggle sound">
+    <span id="sound-icon">🔊</span>
+  </button>
+
+  <!-- Background Scenery (Pixel Clouds & City Silhouette) -->
+  <div class="sky-scenery">
+    <div class="pixel-cloud c1"></div>
+    <div class="pixel-cloud c2"></div>
+    <div class="pixel-cloud c3"></div>
+    <div class="pixel-star s1">✦</div>
+    <div class="pixel-star s2">✧</div>
+    <div class="pixel-star s3">✦</div>
+    <div class="pixel-star s4">✧</div>
+    <div class="pixel-star s5">✦</div>
+  </div>
+
+  <main class="app-viewport">
+    
+    <!-- ================= SCREEN 1: PROPOSAL ================= -->
+    <section id="screen-proposal" class="screen active">
+      <div class="pixel-box">
+        <div class="avatar-frame">
+          <img id="proposal-gif" src="assets/images/propose_bubu.gif" alt="Cute character" class="avatar-gif">
+        </div>
+        
+        <h1 class="pixel-title">Will you go out with me?</h1>
+        <p class="subtitle" id="proposal-sub">Hey <span class="recipient-name">cutie</span>, I have a question for you... 🥺</p>
+        
+        <div class="proposal-actions">
+          <button id="btn-yes" class="btn-pixel btn-yes">
+            <span class="btn-text">YES✦</span>
+          </button>
+          
+          <button id="btn-no" class="btn-pixel btn-no">
+            <span class="btn-text">No</span>
+          </button>
+        </div>
+        
+        <div id="no-microcopy" class="microcopy"></div>
+      </div>
+    </section>
+
+    <!-- ================= SCREEN 2: YAY CELEBRATION ================= -->
+    <section id="screen-yay" class="screen">
+      <div class="pixel-box">
+        <div class="avatar-frame yay-frame">
+          <img src="assets/images/happy0.gif" alt="Happy dancing" class="avatar-gif">
+        </div>
+        
+        <div class="badge-pill">YAY! SHE SAID YES! 🎉</div>
+        <h2 class="pixel-title">I'm so glad you said yes!</h2>
+        <p class="subtitle">Best decision ever! Now let's plan our cute date together 💕</p>
+        
+        <button id="btn-continue-plan" class="btn-pixel btn-primary">
+          PRESS TO CONTINUE ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= SCREEN 3: PICK A DATE ================= -->
+    <section id="screen-date" class="screen">
+      <div class="pixel-box">
+        <div class="avatar-frame">
+          <img src="assets/images/happy4.gif" alt="Waiting character" class="avatar-gif">
+        </div>
+        
+        <h2 class="pixel-title">PICK A DATE</h2>
+        <p class="subtitle">Choose the day for our cute little plan:</p>
+        
+        <!-- Quick select pills for quick mobile tapping -->
+        <div class="date-quick-picks">
+          <button type="button" class="quick-pill" data-days="0">Today</button>
+          <button type="button" class="quick-pill" data-days="1">Tomorrow</button>
+          <button type="button" class="quick-pill" data-days="weekend">This Weekend 🌸</button>
+          <button type="button" class="quick-pill" data-days="next-sat">Next Saturday ✨</button>
+        </div>
+
+        <div class="date-input-wrap">
+          <label for="date-picker" class="input-label">OR PICK FROM CALENDAR:</label>
+          <input type="date" id="date-picker" class="pixel-date-input">
+        </div>
+
+        <div id="selected-date-display" class="selected-date-banner">
+          📅 Selected: <span id="formatted-date-text">Please pick a date</span>
+        </div>
+
+        <button id="btn-continue-activity" class="btn-pixel btn-primary" disabled>
+          NEXT: PICK ACTIVITY ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= SCREEN 4: CHOOSE ACTIVITIES ================= -->
+    <section id="screen-activity" class="screen">
+      <div class="pixel-box wide">
+        <div class="avatar-frame compact">
+          <img src="assets/images/happy1.gif" alt="Excited character" class="avatar-gif">
+        </div>
+        
+        <h2 class="pixel-title">WHAT WOULD YOU LIKE TO DO?</h2>
+        <p class="subtitle">Tap your favorite activities (you can select multiple!):</p>
+        
+        <div class="activities-grid">
+          <button type="button" class="activity-card" data-activity="Dinner Date">
+            <span class="activity-icon">🍽️</span>
+            <span class="activity-title">DINNER DATE</span>
+            <span class="activity-desc">Somewhere cozy & delicious</span>
+          </button>
+          
+          <button type="button" class="activity-card" data-activity="Movie Night">
+            <span class="activity-icon">🎬</span>
+            <span class="activity-title">MOVIE NIGHT</span>
+            <span class="activity-desc">Popcorn, blankets & cuddles</span>
+          </button>
+          
+          <button type="button" class="activity-card" data-activity="Coffee & Walk">
+            <span class="activity-icon">☕</span>
+            <span class="activity-title">COFFEE & WALK</span>
+            <span class="activity-desc">Sweet sips & holding hands</span>
+          </button>
+          
+          <button type="button" class="activity-card" data-activity="Cute Picnic">
+            <span class="activity-icon">🧺</span>
+            <span class="activity-title">PICNIC</span>
+            <span class="activity-desc">Fresh breeze, snacks & gossip</span>
+          </button>
+          
+          <button type="button" class="activity-card" data-activity="Arcade / Mini Golf">
+            <span class="activity-icon">⛳</span>
+            <span class="activity-title">MINI GOLF / ARCADE</span>
+            <span class="activity-desc">I'll let you win maybe ;)</span>
+          </button>
+          
+          <button type="button" class="activity-card" data-activity="Surprise Me!">
+            <span class="activity-icon">✨</span>
+            <span class="activity-title">SURPRISE ME</span>
+            <span class="activity-desc">Leave everything to me ❤️</span>
+          </button>
+        </div>
+
+        <div class="custom-request-wrap">
+          <label for="custom-wish" class="input-label">ANY SPECIAL CRAVINGS / REQUESTS? (OPTIONAL)</label>
+          <input type="text" id="custom-wish" class="pixel-text-input" placeholder="e.g. Ice cream after, sushi, stargazing..." maxlength="100">
+        </div>
+
+        <button id="btn-lock-in" class="btn-pixel btn-primary" disabled>
+          LOCK IT IN 🔒
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= SCREEN 5: IT'S A DATE (CONFIRMATION TICKET) ================= -->
+    <section id="screen-confirmed" class="screen">
+      <div class="pixel-box">
+        <div class="avatar-frame yay-frame">
+          <img src="assets/images/happy2.gif" alt="Hugging bears" class="avatar-gif">
+        </div>
+        
+        <h2 class="pixel-title celebration-glow">IT'S A DATE! 💖</h2>
+        
+        <!-- Boarding Pass / Ticket Card -->
+        <div class="ticket-card">
+          <div class="ticket-notch notch-left"></div>
+          <div class="ticket-notch notch-right"></div>
+          
+          <div class="ticket-header">
+            <span class="ticket-badge">OFFICIAL DATE PASS 🎟️</span>
+            <span class="ticket-seal">CONFIRMED 🔒</span>
+          </div>
+          
+          <div class="ticket-body">
+            <div class="ticket-row">
+              <span class="t-label">RESERVED FOR:</span>
+              <span class="t-val highlight recipient-name">Jiya 💕</span>
+            </div>
+            
+            <div class="ticket-row">
+              <span class="t-label">DATE:</span>
+              <span class="t-val" id="ticket-date-val">Friday, Nov 14</span>
+            </div>
+            
+            <div class="ticket-row">
+              <span class="t-label">ACTIVITIES:</span>
+              <span class="t-val" id="ticket-activity-val">Dinner Date</span>
+            </div>
+
+            <div class="ticket-row" id="ticket-note-row" style="display:none;">
+              <span class="t-label">SPECIAL REQUEST:</span>
+              <span class="t-val italic" id="ticket-note-val"></span>
+            </div>
+
+            <div class="ticket-row">
+              <span class="t-label">HOST / COMPANION:</span>
+              <span class="t-val">Debangshu 🥰</span>
+            </div>
+          </div>
+          
+          <div class="ticket-footer">
+            <span class="barcode-line">||||| | |||| ||| |||||| | |||||</span>
+            <span class="ticket-code">#LOVE-2026-XOXO</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="confirm-actions">
+          <button id="btn-open-letter" class="btn-pixel btn-secondary">
+            💌 READ SECRET LOVE NOTE
+          </button>
+          
+          <a id="btn-whatsapp-share" href="#" target="_blank" class="btn-pixel btn-whatsapp">
+            <span>💬 SEND ANSWER TO DEBANGSHU</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= LOVE NOTE MODAL ================= -->
+  <div id="letter-modal" class="modal-overlay">
+    <div class="letter-window">
+      <div class="letter-top-bar">
+        <span class="file-tag">📄 love_note.txt</span>
+        <button id="btn-close-letter" class="close-x" aria-label="Close letter">✖</button>
+      </div>
+      
+      <div class="letter-content">
+        <p class="letter-salutation">Hey <span class="recipient-name">cutie</span> 💕,</p>
+        <p class="letter-p">
+          You're really the most special person in the world to me, no matter what. Don't ever let anyone tell you different, okay?
+        </p>
+        <p class="letter-p">
+          You have this way of making even the most ordinary days feel like pure magic. Thank you for saying YES to this date. I cannot wait to look at your smile in person and make sweet memories together.
+        </p>
+        <p class="letter-p letter-closing">
+          Count the hours down with me,<br>
+          <strong class="sender-sig">Debangshu 💖</strong>
+        </p>
+      </div>
+
+      <div class="letter-footer">
+        <button id="btn-dismiss-letter" class="btn-pixel btn-primary btn-sm">CLOSE NOTE 💕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Foreground Landscape pixel horizon -->
+  <footer class="pixel-horizon">
+    <div class="horizon-grass"></div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
