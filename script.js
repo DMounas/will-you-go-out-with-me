@@ -5,9 +5,9 @@
 (() => {
   // --- 1. URL Parameters & Customization ---
   const urlParams = new URLSearchParams(window.location.search);
-  const recipientName = urlParams.get('to') || 'Jiya';
-  const senderName = urlParams.get('from') || 'Debangshu';
-  const customPhone = urlParams.get('phone') || ''; // optional WhatsApp number
+  const recipientName = urlParams.get('to') || 'Pritishmita';
+  const senderName = urlParams.get('from') || 'dmounas';
+  const customPhone = urlParams.get('phone') || '919395240600'; // Debangshu / dmounas phone
 
   // Inject Names into DOM
   document.querySelectorAll('.recipient-name').forEach(el => el.textContent = recipientName);
@@ -304,11 +304,11 @@
   const activityCards = document.querySelectorAll('.activity-card');
   const btnLockIn = document.getElementById('btn-lock-in');
   const customWishInput = document.getElementById('custom-wish');
-  const selectedActivities = new Set(['Dinner Date']); // default
+  const selectedActivities = new Set(['Café & Chai Date']); // default
 
   // Highlight initial default
   activityCards.forEach(card => {
-    if (card.getAttribute('data-activity') === 'Dinner Date') {
+    if (card.getAttribute('data-activity') === 'Café & Chai Date') {
       card.classList.add('selected');
     }
   });

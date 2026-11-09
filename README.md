@@ -19,22 +19,22 @@ An interactive, retro 8-bit pixel-art date proposal web app built with love, fea
   - Character stickers transition through sad/crying states
 - **📅 Interactive Date Picker**:
   - Quick-select pills (*Today*, *Tomorrow*, *This Weekend 🌸*, *Next Saturday ✨*) or calendar picker
-- **🎀 Activity Selector**:
-  - Multi-select interactive cards (*Dinner Date*, *Movie Night*, *Coffee & Walk*, *Sunset Picnic*, *Mini Golf / Arcade*, *Surprise Me!*)
+- **🎀 Activity Selector (Practical Silchar Dates)**:
+  - Multi-select interactive cards (*Café & Chai Date*, *Dinner Date*, *Barak Riverfront Sunset*, *Silchar Street Food Crawl*, *Movie Date at Gold Digital*, *Long Scenic Drive*)
   - Optional cravings / custom request input
 - **🎟️ Boarding Pass / Date Ticket Confirmation**:
   - Officially confirmed pass with barcode and custom choices
   - Unfoldable `love_note.txt` secret digital letter modal
-  - 1-Tap WhatsApp share button pre-filled with her choices
+  - 1-Tap WhatsApp share button pre-filled with her choices directly targeting `dmounas` (+91-9395240600)
 - **🔊 Web Audio Synthesizer**:
   - Built-in 8-bit chimes, boops, lock sounds, and victory fanfares (zero external audio dependencies)
 
 ## 💌 Personalization URL Query Parameters
 
 You can customize the recipient and sender names directly in the link:
-- `?to=Jiya` (Recipient Name)
-- `?from=Debangshu` (Sender Name)
-- `?phone=919876543210` (Optional WhatsApp number to direct message)
+- `?to=Pritishmita` (Recipient Name, default: `Pritishmita`)
+- `?from=dmounas` (Sender Name, default: `dmounas`)
+- `?phone=919395240600` (WhatsApp number, default: `919395240600`)
 
 Example:
-`https://dmounas.github.io/will-you-go-out-with-me/?to=Jiya&from=Debangshu`
+`https://dmounas.github.io/will-you-go-out-with-me/?to=Pritishmita&from=dmounas`
