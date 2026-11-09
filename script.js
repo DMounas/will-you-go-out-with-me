@@ -217,73 +217,154 @@
     showScreen('screen-date');
   });
 
-  // --- 6. Screen 3: Date Picker Logic ---
-  const datePicker = document.getElementById('date-picker');
+  // --- 6. Screen 3: Retro Pixel Calendar Widget ---
+  const calPrevBtn = document.getElementById('cal-prev');
+  const calNextBtn = document.getElementById('cal-next');
+  const calMonthYear = document.getElementById('cal-month-year');
+  const calGrid = document.getElementById('cal-grid');
   const formattedDateText = document.getElementById('formatted-date-text');
   const btnContinueActivity = document.getElementById('btn-continue-activity');
   const quickPills = document.querySelectorAll('.quick-pill');
 
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const now = new Date();
+  const currentRealYear = now.getFullYear();
+  const currentRealMonth = now.getMonth();
+  const currentRealDay = now.getDate();
+
+  let viewYear = currentRealYear;
+  let viewMonth = currentRealMonth;
+
+  let selectedYear = currentRealYear;
+  let selectedMonth = currentRealMonth;
+  let selectedDay = currentRealDay;
   let selectedDateObj = null;
 
-  // Pure local YYYY-MM-DD formatter (avoids all UTC timezone offset bugs)
-  function formatToYMD(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-
-  // Parse YYYY-MM-DD into a local Date at 12:00:00 (noon) to avoid any DST or midnight shifts
-  function parseFromYMD(ymdStr) {
-    if (!ymdStr) return null;
-    const parts = ymdStr.split('-').map(Number);
-    if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) return null;
-    return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
-  }
-
-  function formatDateFriendly(date) {
-    if (!date) return '';
+  function formatDateFriendly(y, m, d) {
+    let temp;
+    if (y instanceof Date) {
+      temp = y;
+    } else {
+      temp = new Date(y, m, d, 12, 0, 0);
+    }
     const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+    return temp.toLocaleDateString('en-US', options);
   }
 
-  // Set min date to today in local time
-  const today = new Date();
-  datePicker.min = formatToYMD(today);
+  function renderCalendar() {
+    calMonthYear.textContent = `${monthNames[viewMonth]} ${viewYear}`;
 
-  function applyDate(date, syncInput = true) {
-    if (!date) return;
-    // Always anchor to noon to eliminate midnight rollover
-    selectedDateObj = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
-    const ymd = formatToYMD(selectedDateObj);
-    if (syncInput) {
-      datePicker.value = ymd;
+    // Disable prev button if viewing the current month
+    if (viewYear === currentRealYear && viewMonth <= currentRealMonth) {
+      calPrevBtn.style.opacity = '0.3';
+      calPrevBtn.style.pointerEvents = 'none';
+    } else {
+      calPrevBtn.style.opacity = '1';
+      calPrevBtn.style.pointerEvents = 'auto';
     }
-    formattedDateText.textContent = formatDateFriendly(selectedDateObj);
+
+    calGrid.innerHTML = '';
+
+    const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay(); // 0 is Sunday
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    // Leading empty cells
+    for (let i = 0; i < firstDayIndex; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'cal-day-cell empty';
+      calGrid.appendChild(emptyCell);
+    }
+
+    // Days in current view month
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayCell = document.createElement('button');
+      dayCell.type = 'button';
+      dayCell.className = 'cal-day-cell';
+      dayCell.textContent = d;
+
+      const isPast = (
+        viewYear < currentRealYear ||
+        (viewYear === currentRealYear && viewMonth < currentRealMonth) ||
+        (viewYear === currentRealYear && viewMonth === currentRealMonth && d < currentRealDay)
+      );
+
+      const isToday = (
+        viewYear === currentRealYear &&
+        viewMonth === currentRealMonth &&
+        d === currentRealDay
+      );
+
+      const isSelected = (
+        viewYear === selectedYear &&
+        viewMonth === selectedMonth &&
+        d === selectedDay
+      );
+
+      if (isPast) {
+        dayCell.classList.add('disabled');
+      }
+      if (isToday) {
+        dayCell.classList.add('today');
+      }
+      if (isSelected) {
+        dayCell.classList.add('selected');
+      }
+
+      if (!isPast) {
+        dayCell.addEventListener('click', () => {
+          initAudio();
+          playClick();
+          vibrate();
+          selectDate(viewYear, viewMonth, d);
+          quickPills.forEach(p => p.classList.remove('selected'));
+        });
+      }
+
+      calGrid.appendChild(dayCell);
+    }
+  }
+
+  function selectDate(y, m, d) {
+    selectedYear = y;
+    selectedMonth = m;
+    selectedDay = d;
+    viewYear = y;
+    viewMonth = m;
+
+    selectedDateObj = new Date(y, m, d, 12, 0, 0);
+    formattedDateText.textContent = formatDateFriendly(y, m, d);
     btnContinueActivity.removeAttribute('disabled');
+
+    renderCalendar();
   }
 
-  function onDatePickerChange() {
-    if (datePicker.value) {
-      const chosen = parseFromYMD(datePicker.value);
-      if (chosen) {
-        initAudio();
-        playClick();
-        vibrate();
-        quickPills.forEach(p => p.classList.remove('selected'));
-        applyDate(chosen, false);
-      }
+  // Month navigation
+  calPrevBtn.addEventListener('click', () => {
+    initAudio();
+    playClick();
+    if (viewMonth === 0) {
+      viewMonth = 11;
+      viewYear--;
+    } else {
+      viewMonth--;
     }
-  }
+    renderCalendar();
+  });
 
-  datePicker.addEventListener('change', onDatePickerChange);
-  datePicker.addEventListener('input', onDatePickerChange);
-  datePicker.addEventListener('click', () => {
-    try {
-      if (typeof datePicker.showPicker === 'function') {
-        datePicker.showPicker();
-      }
-    } catch (e) {}
+  calNextBtn.addEventListener('click', () => {
+    initAudio();
+    playClick();
+    if (viewMonth === 11) {
+      viewMonth = 0;
+      viewYear++;
+    } else {
+      viewMonth++;
+    }
+    renderCalendar();
   });
 
   // Quick pick pills
@@ -296,8 +377,7 @@
       pill.classList.add('selected');
 
       const daysVal = pill.getAttribute('data-days');
-      const now = new Date();
-      const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
+      const target = new Date(currentRealYear, currentRealMonth, currentRealDay, 12, 0, 0);
 
       if (daysVal === '0') {
         // Today
@@ -313,16 +393,17 @@
         target.setDate(target.getDate() + diff);
       }
 
-      applyDate(target, true);
+      selectDate(target.getFullYear(), target.getMonth(), target.getDate());
     });
   });
 
-  // Auto-select upcoming weekend by default for immediate convenience
-  const defaultSat = new Date();
+  // Default selection: Upcoming Saturday (Nov 14, 2026)
+  const defaultSat = new Date(currentRealYear, currentRealMonth, currentRealDay, 12, 0, 0);
   const dayOfWeek = defaultSat.getDay();
   const diffToSat = (6 - dayOfWeek + 7) % 7 || 7;
-  const initialDate = new Date(defaultSat.getFullYear(), defaultSat.getMonth(), defaultSat.getDate() + diffToSat, 12, 0, 0);
-  applyDate(initialDate, true);
+  defaultSat.setDate(defaultSat.getDate() + diffToSat);
+
+  selectDate(defaultSat.getFullYear(), defaultSat.getMonth(), defaultSat.getDate());
   quickPills.forEach(p => {
     if (p.getAttribute('data-days') === 'weekend') p.classList.add('selected');
   });
